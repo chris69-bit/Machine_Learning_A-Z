@@ -14,10 +14,10 @@ This repository includes simple regression projects that demonstrate different t
 ## Projects
 
 ### 1. Simple Linear Regression for the training set
-![Simple Linear Regression](simple_linear_regression.png)
+![Simple Linear Regression](/2.%20Regression/images/simple_linear_regression.png)
 
 ### 2. Simple Linear Regression for the test set
-![Simple Linear Regression](simple_linear_regression2.png)
+![Simple Linear Regression](/2.%20Regression/images/simple_linear_regression2.png)
 
 ## License
 
