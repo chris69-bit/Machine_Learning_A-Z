@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
-import uvicorn
+#from . import models
+#from .database import engine
+# import uvicorn
+
+#models.Base.metadata.create_all(bind=engine)
 
 # Decorator
 app = FastAPI()
