@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Optional
+import uvicorn
 
 # Decorator
 app = FastAPI()
@@ -11,7 +13,7 @@ def index():
 
 
 @app.get("/blog")
-def show(limit, published: bool):
+def show(limit=10, published: bool = True, sort: str = None):
     if published:
         return {"data": f"{limit} published blogs from the db"}
     else:
@@ -26,7 +28,7 @@ def page(id: int):
     return {"data": "Blog list"}
 
 @app.get("/blog/{id}/comments")
-def comments():
+def comments(id: int, limit=10):
     return {"data": "Blog list"}
 
 
@@ -34,8 +36,11 @@ def comments():
 class Blog(BaseModel):
     title: str
     body: str
+    published: Optional[bool]
     
 @app.post("/blog")
 def create_blog(request: Blog):
     return {"data": f"Blog is created with title as {request.title}"}
     
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="127.0.0.1", port=9000)
