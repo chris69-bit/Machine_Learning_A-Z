@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, Depends, status, Response, HTTPException
 import models
 from database import engine, SessionLocal
 from schemas import Blog
@@ -41,13 +41,38 @@ def unpublished():
     return {"data": "Blog list"}
 
 @app.get("/blog/{id}")
-def page(id: int, db: Session = Depends(get_db)):
+def page(id: int, response: Response, db: Session = Depends(get_db), status_code=status.HTTP_200_OK):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
-    return blog
+    if not blog:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail": "Blog with the given id not found"}
+    else:
+        return blog
 
 @app.get("/blog/{id}/comments")
 def comments(id: int, limit=10):
     return {"data": "Blog list"}
+
+# Delete Items
+@app.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_blog(id: int, db: Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id)
+    if not blog.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Blog with id {id} not found")
+    blog.delete(synchronize_session=False)
+    db.commit()
+    return {"details" : "Blog deleted successfully"}
+
+#Update Items
+@app.put("/blog/{id}", status_code = status.HTTP_202_ACCEPTED)
+def update(id: int, request: Blog, db: Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id)
+    if not blog.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Blog with id {id} not found")
+    blog.update(request)
+    db.commit()
+    return{"details": "Blog updated successfully"}
+    
 
     
 # if __name__ == "__main__":
