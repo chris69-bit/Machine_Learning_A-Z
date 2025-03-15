@@ -1,11 +1,11 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Optional
-#from . import models
-#from .database import engine
+from fastapi import FastAPI, Depends
+import models
+from database import engine, SessionLocal
+from schemas import Blog
+from sqlalchemy.orm import Session
 # import uvicorn
 
-#models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 # Decorator
 app = FastAPI()
@@ -35,16 +35,22 @@ def page(id: int):
 def comments(id: int, limit=10):
     return {"data": "Blog list"}
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-# Create a Blog
-class Blog(BaseModel):
-    title: str
-    body: str
-    published: Optional[bool]
     
 @app.post("/blog")
-def create_blog(request: Blog):
-    return {"data": f"Blog is created with title as {request.title}"}
+def create_blog(request: Blog, db: Session = Depends(get_db)):
+    new_blog = models.Blog(title=request.title, body=request.body)
+    db.add(new_blog)
+    db.commit()
+    db.refresh(new_blog)
+    
+    return new_blog
     
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="127.0.0.1", port=9000)
