@@ -80,7 +80,6 @@ def delete_blog(id: int, db: Session = Depends(get_db)):
    
 #Adding a user to the database
 
-
 @app.post("/user", status_code = status.HTTP_201_CREATED, response_model=ShowUser)
 def create_user(request: User, db: Session = Depends(get_db)):
     new_user = models.User(username=request.username, email=request.email, password=Hash.bcrypt(request.password))
@@ -89,6 +88,12 @@ def create_user(request: User, db: Session = Depends(get_db)):
     db.refresh(new_user)
     
     return new_user
+
+# Get Users with Id
+@app.get("/user/{id}", status_code=status.HTTP_200_OK, response_model=ShowUser)
+def get_user(id: int, response: Response, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    return user
 
     
 # if __name__ == "__main__":
